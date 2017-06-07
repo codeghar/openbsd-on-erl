@@ -1,0 +1,41 @@
+---
+- name: insert unbound_flags="" in /etc/rc.conf.local
+  lineinfile:
+    state: present
+    path: /etc/rc.conf.local
+    regexp: '^unbound_flags='
+    line: 'unbound_flags=""'
+  become: yes
+
+- name: copy unbound conf
+  template:
+    src: unbound.conf.j2
+    dest: /var/unbound/etc/unbound.conf
+    owner: root
+    group: wheel
+    mode: "0644"
+  become: yes
+
+- name: insert ignore domain-name-servers in /etc/dhclient.conf
+  lineinfile:
+    state: present
+    path: /etc/dhclient.conf
+    regexp: '^ignore domain-name-servers'
+    line: 'ignore domain-name-servers;'
+  become: yes
+
+- name: insert supersede domain-name-servers in /etc/dhclient.conf
+  lineinfile:
+    state: present
+    path: /etc/dhclient.conf
+    regexp: '^supersede domain-name-servers'
+    line: 'supersede domain-name-servers 127.0.0.1;'
+  become: yes
+
+- name: enable unbound
+  shell: rcctl enable unbound
+  become: yes
+
+- name: start unbound
+  shell: rcctl start unbound
+  become: yes

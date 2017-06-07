@@ -1,0 +1,18 @@
+---
+- name: copy dhcpd conf
+  template:
+    src: dhcpd.conf.j2
+    dest: /etc/dhcpd.conf
+  become: yes
+
+- name: insert dhcpd_flags="vether0" in /etc/rc.conf.local
+  lineinfile:
+    state: present
+    path: /etc/rc.conf.local
+    regexp: '^dhcpd_flags='
+    line: 'dhcpd_flags="vether0"'
+  become: yes
+
+- name: restart dhcpd
+  shell: rcctl restart dhcpd
+  become: yes

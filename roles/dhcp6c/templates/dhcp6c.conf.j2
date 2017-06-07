@@ -1,0 +1,15 @@
+interface cnmac0 {
+    send ia-pd 0;
+    send ia-na 1;
+};
+
+id-assoc na 1 {
+};
+
+id-assoc pd 0 {
+    prefix ::/64 infinity;
+    prefix-interface vether0 {
+        sla-id 1;
+        sla-len 0;
+    };
+};

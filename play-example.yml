@@ -1,0 +1,46 @@
+---
+- hosts: erl
+  roles:
+    - role: install
+    - role: network
+    - role: dhcp6c
+    - role: unbound
+      interfaces:
+        - "127.0.0.1"
+        - "::1"
+        - "{{ vether0_ip }}"
+    - role: dhcpd
+    - role: router
+    - role: pf
+  vars:
+    hostname: "erl"
+    domain: "home.lan"
+    cnmac0_override_mac: "OV:ER:RI:DE:00:00"
+    cnmac0_original_mac: "OR:IG:IN:AL:00:00"
+    vether0_octet_1: "192"
+    vether0_octet_2: "168"
+    vether0_octet_3: "1"
+    vether0_ip: "192.168.1.1"
+    vether0_netmask: "255.255.255.0"
+    vether0_broadcast: "192.168.1.255"
+    dns_forwarders:
+      - ipaddr: "23.226.230.72"
+        org: "OpenDNS"
+      - ipaddr: "8.8.4.4"
+        org: "Google"
+      - ipaddr: "37.235.1.174"
+        org: "FreeDNS"
+      - ipaddr: "8.8.8.8"
+        org: "Google"
+    dns_forwarders_ipv6:
+      - ipaddr: "2604:180:1:22a::8c53"
+        org: "OpenDNS"
+      - ipaddr: "2600:3c02::f03c:91ff:fe84"
+        org: "OpenDNS"
+    dns_records:
+      - hostname: "device1"
+        ipv4addr: "192.168.1.55"
+        macaddr: "00:00:00:00:be:ef"
+      - hostname: "device2"
+        macaddr: "00:00:00:01:be:ef"
+        ipv4addr: "192.168.1.97"

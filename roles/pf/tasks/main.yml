@@ -1,0 +1,10 @@
+---
+- name: copy pf rules
+  template:
+    src: pf.conf.j2
+    dest: /etc/pf.conf
+  become: yes
+
+- name: reload pf config
+  shell: pfctl -f /etc/pf.conf
+  become: yes

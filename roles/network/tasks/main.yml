@@ -1,0 +1,55 @@
+---
+- name: copy hostname.cnmac0
+  template:
+    src: hostname.cnmac0.j2
+    dest: /etc/hostname.cnmac0
+    mode: 0640
+  become: yes
+
+- name: copy hostname.cnmac1
+  template:
+    src: hostname.cnmac1.j2
+    dest: /etc/hostname.cnmac1
+    mode: 0640
+  become: yes
+
+- name: copy hostname.cnmac2
+  template:
+    src: hostname.cnmac2.j2
+    dest: /etc/hostname.cnmac2
+    mode: 0640
+  become: yes
+
+- name: copy hostname.vether0
+  template:
+    src: hostname.vether0.j2
+    dest: /etc/hostname.vether0
+    mode: 0640
+  become: yes
+
+- name: copy hostname.bridge0
+  template:
+    src: hostname.bridge0.j2
+    dest: /etc/hostname.bridge0
+    mode: 0640
+  become: yes
+
+- name: restart cnmac1
+  shell: sh /etc/netstart cnmac1
+  ignore_errors: false
+  become: yes
+
+- name: restart cnmac2
+  shell: sh /etc/netstart cnmac2
+  ignore_errors: false
+  become: yes
+
+- name: restart vether0
+  shell: sh /etc/netstart vether0
+  ignore_errors: false
+  become: yes
+
+- name: restart bridge0
+  shell: sh /etc/netstart bridge0
+  ignore_errors: false
+  become: yes

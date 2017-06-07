@@ -1,0 +1,126 @@
+### ~~~ Interface layout ~~~ ###
+
+# cnmac0: 802.3ab (ethernet) to cable modem
+# cnmac1: 802.3ab (ethernet) to internal switch
+# cnmac2: 802.3ab (ethernet) to internal switch
+# vether0: persists address {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.0/{{ vether0_netmask }}
+# bridge0: Ethernet bridge over cnmac1 and cnmac2
+# pflog0: target interface for blocked packets
+
+### ~~~ Constants and variables ~~~ ###
+
+# All addresses associated with this host
+self = "{ (egress), (vether0) }"
+
+self_lan = "{ (vether0) }"
+
+# RFC 6890: Special-Purpose IP Address Registries:
+# https://www.iana.org/assignments/iana-ipv4-special-registry/
+# https://www.iana.org/assignments/iana-ipv6-special-registry/
+
+# Included below are all address blocks with either Forwardable = False,
+# Global = False, or both, but excluding 2001::/23 because it is often
+# superseded by more specific allocations, as of 2015-08-05.
+
+table <martians> const { \
+    0.0.0.0/8, \
+    10.0.0.0/8, \
+    100.64.0.0/10, \
+    127.0.0.0/8, \
+    169.254.0.0/16, \
+    172.16.0.0/12, \
+    192.0.0.0/24, \
+    192.0.2.0/24, \
+    192.168.0.0/16, \
+    198.18.0.0/15, \
+    198.51.100.0/24, \
+    203.0.113.0/24, \
+    240.0.0.0/4, \
+    255.255.255.255/32, \
+    ::1/128, \
+    ::/128, \
+    ::ffff:0:0/96, \
+    100::/64, \
+    2001::/32, \
+    2001:2::/48, \
+    2001:db8::/32, \
+    fc00::/7, \
+    fe80::/10 \
+}
+
+### ~~~ Default rules ~~~ ###
+
+# Never touch loopback interfaces
+set skip on lo
+
+# Normalise packets, especially IPv4 DF and Identification
+match in all scrub (no-df random-id)
+
+# Limit the MSS on PPPoE to 1440 octets
+# match on pppoe0 scrub (max-mss 1440)
+
+# Block all packets by default, logging them to pflog0
+block log
+
+### ~~~ Link-scoped services ~~~ ###
+
+# DHCPv6 client: make IA_PD requests and receive responses to them
+pass out quick on egress inet6 proto udp from (egress) to ff02::1:2 port dhcpv6-server
+pass in quick on egress inet6 proto udp to (egress) port dhcpv6-client
+
+### ~~~ Bulk pass rules ~~~ ###
+
+# Pass all traffic on internal interfaces
+# vether0 is necessary here, but bridge0 is not
+pass quick on { vether0 cnmac1 cnmac2 }
+
+# Pass all outbound IPv6 traffic
+pass out quick on egress inet6 from { egress, (vether0:network) } modulate state
+
+# Pass all outbound IPv4 traffic from this host
+pass out quick on egress inet from egress modulate state
+
+# NAT all outbound IPv4 traffic from the rest of our network
+pass out quick on egress inet from (vether0:network) nat-to (egress) modulate state
+
+### ~~~ Block undesirable traffic ~~~ ###
+
+# These rules must not precede the DHCPv6 client or NAT rules above
+block log quick on egress from { no-route, urpf-failed, <martians> }
+block log quick on egress to { no-route, <martians> }
+
+### ~~~ Pass some ICMP and ICMPv6 traffic ~~~ ####
+
+# Pass all inbound ICMP echo requests
+pass in quick on egress inet proto icmp icmp-type echoreq
+pass in quick on egress inet6 proto icmp6 icmp6-type echoreq
+
+# RFC 4890: Recommendations for Filtering ICMPv6 Messages in Firewalls
+pass quick on egress inet6 proto icmp6 icmp6-type { 1, 2, 128, 129, 133, 134, 135, 136, 137 }
+#pass quick on egress inet6 proto icmp6 icmp6-type { 1, 2, 128, 129 }
+pass quick on egress inet6 proto icmp6 icmp6-type 3 code 0
+pass quick on egress inet6 proto icmp6 icmp6-type 3 code 1
+pass quick on egress inet6 proto icmp6 icmp6-type 4 code 0
+pass quick on egress inet6 proto icmp6 icmp6-type 4 code 1
+pass quick on egress inet6 proto icmp6 icmp6-type 4 code 2
+
+### ~~~ Open services on this router ~~~ ###
+
+# OpenSSH server
+pass in on egress proto { tcp, udp } to $self_lan port ssh
+
+# Allow LAN to ping us
+pass in on { vether0 } inet proto icmp to any icmp-type { echoreq, echorep }
+
+# Allow LAN to access DNS, DHCP, and NTP
+pass quick on egress inet proto udp from (vether0:network) to any port { 53, 67, 123 }
+pass quick on egress inet proto udp from $self to any port { 53, 67, 123 }
+pass quick on egress inet6 proto udp from (vether0:network) to any port { 53, 67, 123 }
+pass quick on egress inet6 proto udp from $self to any port { 53, 67, 123 }
+
+# Allow DHCPv6 request
+pass quick on egress inet6 proto udp from $self to any port 547
+
+# Allow DHCPv6 response
+pass in on egress inet6 proto udp to $self port 546
+

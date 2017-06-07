@@ -1,0 +1,59 @@
+---
+- name: copy resolv.conf.tail
+  template:
+    src: resolv.conf.tail.j2
+    dest: /etc/resolv.conf.tail
+  become: yes
+
+- name: touch file /etc/sysctl.conf
+  file:
+    dest: /etc/sysctl.conf
+    owner: root
+    group: wheel
+    state: touch
+  become: yes
+
+- name: insert net.inet.ip.forwarding=1 in /etc/sysctl.conf
+  lineinfile:
+    state: present
+    path: /etc/sysctl.conf
+    regexp: '^net.inet.ip.forwarding=1'
+    line: 'net.inet.ip.forwarding=1'
+  become: yes
+
+- name: insert net.inet6.ip6.forwarding=1 in /etc/sysctl.conf
+  lineinfile:
+    state: present
+    path: /etc/sysctl.conf
+    regexp: '^net.inet6.ip6.forwarding=1'
+    line: 'net.inet6.ip6.forwarding=1'
+  become: yes
+
+- name: load newly added sysctl values
+  shell: xargs sysctl < /etc/sysctl.conf
+  become: yes
+
+- name: insert rtadvd_flags="vether0" in /etc/rc.conf.local
+  lineinfile:
+    state: present
+    path: /etc/rc.conf.local
+    regexp: '^rtadvd_flags='
+    line: 'rtadvd_flags="vether0"'
+  become: yes
+
+- name: copy rtadvd conf
+  template:
+    src: rtadvd.conf.j2
+    dest: /etc/rtadvd.conf
+    owner: root
+    group: wheel
+    mode: "0644"
+  become: yes
+
+- name: enable rtadvd
+  shell: rcctl enable rtadvd
+  become: yes
+
+- name: start rtadvd
+  shell: rcctl start rtadvd
+  become: yes
