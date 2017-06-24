@@ -1,3 +1,4 @@
 dhcp lladdr {{ cnmac0_override_mac }}
 up
 inet6 autoconf
+!/sbin/route add ::/0 -ifp cnmac0 fe80::
