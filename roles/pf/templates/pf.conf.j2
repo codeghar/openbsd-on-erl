@@ -117,10 +117,3 @@ pass quick on egress inet proto udp from (vether0:network) to any port { 53, 67,
 pass quick on egress inet proto udp from $self to any port { 53, 67, 123 }
 pass quick on egress inet6 proto udp from (vether0:network) to any port { 53, 67, 123 }
 pass quick on egress inet6 proto udp from $self to any port { 53, 67, 123 }
-
-# Allow DHCPv6 request
-pass quick on egress inet6 proto udp from $self to any port 547
-
-# Allow DHCPv6 response
-pass in on egress inet6 proto udp to $self port 546
-

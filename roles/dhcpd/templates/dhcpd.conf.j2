@@ -1,13 +1,13 @@
 authoritative;
 option domain-name "{{ domain }}";
+option routers {{ vether0_ip }};
+option broadcast-address {{ vether0_broadcast }};
+option domain-name-servers {{ vether0_ip }}{% for item in dns_forwarders %}, {{ item.ipaddr }}{% endfor %};
 default-lease-time 43200;
 max-lease-time 90000;
 
 subnet {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.0 netmask {{ vether0_netmask }} {
-    range {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.21 {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.254;
-    option routers {{ vether0_ip }};
-    option broadcast-address {{ vether0_broadcast }};
-    option domain-name-servers {{ vether0_ip }}{% for item in dns_forwarders %}, {{ item.ipaddr }}{% endfor %};
+    range {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.21 {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.200;
 }
 
 {% for item in dns_records %}
@@ -15,4 +15,5 @@ host {{ item.hostname }} {
     hardware ethernet {{ item.macaddr }};
     fixed-address {{ item.ipv4addr }};
 }
+
 {% endfor %}
