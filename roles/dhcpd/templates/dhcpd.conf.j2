@@ -7,7 +7,7 @@ default-lease-time 43200;
 max-lease-time 90000;
 
 subnet {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.0 netmask {{ vether0_netmask }} {
-    range {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.21 {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.254;
+    range {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.21 {{ vether0_octet_1 }}.{{ vether0_octet_2 }}.{{ vether0_octet_3 }}.200;
 }
 
 {% for item in dns_records %}
