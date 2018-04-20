@@ -1,4 +1,13 @@
 ---
+- name: copy dhclient.conf
+  template:
+    src: dhclient.conf.j2
+    dest: /etc/dhclient.conf
+    mode: 0640
+  become: yes
+
+# Helped by
+# http://openbsd-archive.7691.n7.nabble.com/Adding-default-IPv6-route-fails-on-6-1-td316186.html
 - name: copy hostname.cnmac0
   template:
     src: hostname.cnmac0.j2
