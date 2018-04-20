@@ -2,7 +2,7 @@ authoritative;
 option domain-name "{{ domain }}";
 option routers {{ vether0_ip }};
 option broadcast-address {{ vether0_broadcast }};
-option domain-name-servers {{ vether0_ip }}{% for item in dns_forwarders %}, {{ item.ipaddr }}{% endfor %};
+option domain-name-servers {{ vether0_ip }};
 default-lease-time 43200;
 max-lease-time 90000;
 
