@@ -1,0 +1,80 @@
+---
+- name: enable lease release on dhcpd shutdown in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^nohook resolv.conf'
+    line: 'nohook resolv.conf'
+    insertafter: EOF
+  become: yes
+
+- name: enable lease release on dhcpd shutdown in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^release'
+    line: 'release'
+    insertafter: '^nohook resolv.conf'
+  become: yes
+
+- name: disable ipv4 handling in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^denyinterfaces cnmac1 cnmac2'
+    line: 'denyinterfaces cnmac1 cnmac2'
+    insertafter: '^release'
+  become: yes
+
+- name: disable ipv4 handling in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^noipv4'
+    line: 'noipv4'
+    insertafter: '^denyinterfaces cnmac1 cnmac2'
+  become: yes
+
+- name: insert cnmac0 line 1 in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^interface cnmac0'
+    line: 'interface cnmac0'
+    insertafter: '^noipv4'
+  become: yes
+
+- name: insert cnmac0 line 2 in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^    ipv6rs'
+    line: '    ipv6rs'
+    insertafter: '^interface cnmac0'
+  become: yes
+
+- name: insert cnmac0 line 3 in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^    ia_na 1'
+    line: '    ia_na 1'
+    insertafter: '^    ipv6rs'
+  become: yes
+
+- name: insert internal interface line 1 in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^    ia_pd 2 vether0/0/64'
+    line: '    ia_pd 2 vether0/0/64'
+    insertafter: '^    ia_na 1'
+  become: yes
+
+- name: enable dhcpcd
+  shell: rcctl enable dhcpcd
+  become: yes
+
+- name: restart dhcpcd
+  shell: rcctl restart dhcpcd
+  become: yes

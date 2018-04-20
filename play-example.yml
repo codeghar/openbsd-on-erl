@@ -3,7 +3,7 @@
   roles:
     - role: install
     - role: network
-    - role: dhcp6c
+    - role: dhcpcd
     - role: unbound
       interfaces:
         - "127.0.0.1"
