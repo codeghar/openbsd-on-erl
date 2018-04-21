@@ -1,3 +1,3 @@
-[erl]
-erl-admin-dynamic ansible_python_interpreter=/usr/local/bin/python2.7
+[ubnts]
 erl-admin ansible_python_interpreter=/usr/local/bin/python2.7
+usg-admin ansible_python_interpreter=/usr/local/bin/python2.7
