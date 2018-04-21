@@ -3,7 +3,7 @@
   roles:
     - role: install
     - role: network
-    - role: dhcp6c
+    - role: dhcpcd
     - role: unbound
       interfaces:
         - "127.0.0.1"
@@ -23,20 +23,31 @@
     vether0_ip: "192.168.1.1"
     vether0_netmask: "255.255.255.0"
     vether0_broadcast: "192.168.1.255"
-    dns_forwarders:
-      - ipaddr: "23.226.230.72"
-        org: "OpenDNS"
-      - ipaddr: "8.8.4.4"
-        org: "Google"
-      - ipaddr: "37.235.1.174"
-        org: "FreeDNS"
+    dns_forwarders_mixed:
+      - ipaddr: "1.0.0.1"
+        org: "CloudFlare"
+      - ipaddr: "9.9.9.9"
+        org: "Quad9"
+      - ipaddr: "2001:558:FEED::2"
+        org: "Comcast"
+      - ipaddr: "149.112.112.112"
+        org: "Quad9"
       - ipaddr: "8.8.8.8"
         org: "Google"
-    dns_forwarders_ipv6:
-      - ipaddr: "2604:180:1:22a::8c53"
-        org: "OpenDNS"
-      - ipaddr: "2600:3c02::f03c:91ff:fe84"
-        org: "OpenDNS"
+      - ipaddr: "1.1.1.1"
+        org: "CloudFlare"
+      - ipaddr: "75.75.76.76"
+        org: "Comcast"
+      - ipaddr: "2001:4860:4860::8844"
+        org: "Google"
+      - ipaddr: "37.235.1.174"
+        org: "freedns.zone"
+      - ipaddr: "208.67.222.222"
+        org: "OpenDNS - https://en.wikipedia.org/wiki/OpenDNS"
+      - ipaddr: "2001:1608:10:25::9249:d69b"
+        org: "dns.watch"
+      - ipaddr: "84.200.69.80"
+        org: "dns.watch"
     dns_records:
       - hostname: "device1"
         ipv4addr: "192.168.1.55"

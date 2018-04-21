@@ -23,6 +23,8 @@ server:
   # Enable IPv6, "yes" or "no".
     do-ip6: yes
 
+    prefer-ip6: yes
+
   # Enable UDP, "yes" or "no".
     do-udp: yes
 
@@ -40,6 +42,7 @@ server:
     access-control: 10.0.0.0/16 allow
     access-control: 127.0.0.0/8 allow
     access-control: 192.168.0.0/16 allow
+    access-control: ::1 allow
 
   # Read  the  root  hints from this file. Default is nothing, using built in
   # hints for the IN class. The file has the format of  zone files,  with  root
@@ -202,9 +205,6 @@ server:
   #
    forward-zone:
       name: "."
-      {% for item in dns_forwarders %}
-      forward-addr: {{ item.ipaddr }}        # {{ item.org }}
-      {% endfor %}
-      {% for item in dns_forwarders_ipv6 %}
+      {% for item in dns_forwarders_mixed %}
       forward-addr: {{ item.ipaddr }}        # {{ item.org }}
       {% endfor %}

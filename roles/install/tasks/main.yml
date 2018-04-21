@@ -1,6 +1,6 @@
 ---
-- name: install wide-dhcpv6
+- name: install dhcpcd
   openbsd_pkg:
     state: latest
-    name: wide-dhcpv6
+    name: dhcpcd
   become: yes
