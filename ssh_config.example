@@ -1,0 +1,35 @@
+Host erl-setup
+    HostName CHANGEME
+    Port 22
+    User ubnt
+    AddressFamily inet
+    CheckHostIP no
+    StrictHostKeyChecking no
+    IdentityFile ~/.ssh/id_rsa
+
+Host erl-admin
+    HostName CHANGEME
+    Port 22
+    User ubnt
+    AddressFamily inet
+    CheckHostIP no
+    StrictHostKeyChecking no
+    IdentityFile ~/.ssh/id_rsa
+
+Host usg-setup
+    HostName CHANGEME
+    Port 22
+    User ubnt
+    AddressFamily inet
+    CheckHostIP no
+    StrictHostKeyChecking no
+    IdentityFile ~/.ssh/id_rsa
+
+Host usg-admin
+    HostName CHANGEME
+    Port 22
+    User ubnt
+    AddressFamily inet
+    CheckHostIP no
+    StrictHostKeyChecking no
+    IdentityFile ~/.ssh/id_rsa

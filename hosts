@@ -1,3 +1,5 @@
 [ubnts]
-erl-admin ansible_python_interpreter=/usr/local/bin/python2.7
-usg-admin ansible_python_interpreter=/usr/local/bin/python2.7
+erl-setup ansible_python_interpreter=/usr/local/bin/python2.7
+#erl-admin ansible_python_interpreter=/usr/local/bin/python2.7
+usg-setup ansible_python_interpreter=/usr/local/bin/python2.7
+#usg-admin ansible_python_interpreter=/usr/local/bin/python2.7
