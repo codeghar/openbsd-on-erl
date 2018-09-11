@@ -44,8 +44,7 @@ table <martians> const { \
     2001::/32, \
     2001:2::/48, \
     2001:db8::/32, \
-    fc00::/7, \
-    fe80::/10 \
+    fc00::/7 \
 }
 
 ### ~~~ Default rules ~~~ ###
@@ -96,24 +95,18 @@ pass quick on { egress vether0 } inet proto icmp icmp-type { echoreq, echorep }
 pass quick on { egress vether0 } inet6 proto icmp6 icmp6-type { echoreq, echorep }
 
 # RFC 4890: Recommendations for Filtering ICMPv6 Messages in Firewalls
-pass quick on egress inet6 proto icmp6 icmp6-type { 1, 2, 128, 129, 133, 134, 135, 136, 137 }
-#pass quick on egress inet6 proto icmp6 icmp6-type { 1, 2, 128, 129 }
-pass quick on egress inet6 proto icmp6 icmp6-type 3 code 0
-pass quick on egress inet6 proto icmp6 icmp6-type 3 code 1
-pass quick on egress inet6 proto icmp6 icmp6-type 4 code 0
-pass quick on egress inet6 proto icmp6 icmp6-type 4 code 1
-pass quick on egress inet6 proto icmp6 icmp6-type 4 code 2
+pass log quick on { egress vether0 } inet6 proto icmp6
+
+pass log quick on egress inet6 proto udp from (egress) to fe80::d62c:44ff:fe
+pass log quick on egress inet6 proto udp from fe80::d62c:44ff:fe to (egress)
 
 ### ~~~ Open services on this router ~~~ ###
 
 # OpenSSH server
 pass in on egress proto { tcp, udp } to $self_lan port ssh
 
-# Allow LAN to ping us
-pass in on { vether0 } inet proto icmp to any icmp-type { echoreq, echorep }
-
 # Allow LAN to access DNS, DHCP, and NTP
 pass quick on egress inet proto udp from (vether0:network) to any port { 53, 67, 123 }
 pass quick on egress inet proto udp from $self to any port { 53, 67, 123 }
-pass quick on egress inet6 proto udp from (vether0:network) to any port { 53, 67, 123 }
-pass quick on egress inet6 proto udp from $self to any port { 53, 67, 123 }
+pass quick on egress inet6 proto udp from (vether0:network) to any port { 53, 67, 123, 546 }
+pass quick on egress inet6 proto udp from $self to any port { 53, 67, 123, 546 }

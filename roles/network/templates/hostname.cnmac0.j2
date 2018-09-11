@@ -1,4 +1,7 @@
 dhcp lladdr {{ cnmac0_override_mac }}
 up
 inet6 autoconf
-!/usr/bin/rcctl start dhcpcd
+!/usr/sbin/rcctl start dhcpcd
+#!/sbin/route add -inet6 default -ifp cnmac0 fe80::d62c:44ff:fe%cnmac0
+#!/sbin/route add -inet6 default -ifp cnmac0 fe80::1%cnmac0
+#!/sbin/route add -inet6 default -ifp cnmac0 fe80::
