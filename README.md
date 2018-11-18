@@ -55,19 +55,27 @@ as desired.
 
 # Bootstrap
 
-Installing Python 3 is required before the playbook can run. This is done
-outside of a playbook because I like it that way. I have not tried running
-this in a playbook.
+Install Python 3 and pipenv on the box running Ansible.
 
-Install Python 3.
+    $ python3 -m pip install --user -U pipenv
 
-    $ ansible --module-name raw --args "/usr/sbin/pkg_add -U -I -x python%3" --become ubnts
+Python 3 is required on OpenBSD to run Ansible. This is done outside of a
+playbook because I like it that way. I have not tried running this in a
+playbook.
+
+    $ ansible --module-name raw --args "/usr/sbin/pkg_add -U -I -x python%3" --become erl-setup
+    $ ansible --module-name raw --args "/usr/sbin/pkg_add -U -I -x python%3" --become usg-setup
+
+Since you've bootstrapped ``pipenv``, you can run ``pipenv run ansible ...``.
 
 # Playbook
 
 Look at the example playbook and modify vars as needed before running it.
 
     $ ansible-playbook play-example.yml
+
+Since you've bootstrapped ``pipenv``, you can run
+``pipenv run ansible-playbook ...``.
 
 If your assumptions are different from mine then read all the templates in
 various roles and modify them as desired.
@@ -90,12 +98,18 @@ Once the router is working as expected you can use *erl-admin* and/or
 If you have ``make`` installed, you can use the provided *Makefile*. Modify it as
 needed before continuing.
 
-Bootstrap your ERL and/or USG.
+Bootstrap ``pipenv``.
+
+    $ make init
+
+Bootstrap ERL and/or USG by connecting through cnmac0 (WAN interface).
 
     $ make erl-setup
     $ make usg-setup
 
-Run your playbook.
+Run playbook through cnmac1 or cnmac2 (LAN interface(s)) after initial setup.
+This will be required because ssh connections are blocked on WAN interface
+after initial setup.
 
     $ make erl
     $ make usg
