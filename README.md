@@ -6,7 +6,7 @@ of OpenBSD on Ubiquiti EdgeRouter Lite (ERL 3) and/or USG, assuming these:
 - Ansible is installed on your local machine.
 - On ERL/USG:
 
-  - You have installed the latest release (6.3 at time of writing) of OpenBSD.
+  - You have installed the latest release (6.4 at time of writing) of OpenBSD.
   - *root* user has password set.
   - A user called *ubnt* exists.
   - Network and remote access through ssh on interface cnmac0 (eth0 port on ERL or wan1 on USG) is working.
