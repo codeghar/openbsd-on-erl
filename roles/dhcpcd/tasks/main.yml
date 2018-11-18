@@ -1,11 +1,12 @@
 ---
-- name: enable lease release on dhcpd shutdown in /etc/dhcpcd.conf
+- name: ignore resolv.conf in /etc/dhcpcd.conf
   lineinfile:
     state: present
     path: /etc/dhcpcd.conf
     regexp: '^nohook resolv.conf'
     line: 'nohook resolv.conf'
     insertafter: EOF
+  register: dhcpcdconf1
   become: yes
 
 - name: enable lease release on dhcpd shutdown in /etc/dhcpcd.conf
@@ -15,15 +16,17 @@
     regexp: '^release'
     line: 'release'
     insertafter: '^nohook resolv.conf'
+  register: dhcpcdconf2
   become: yes
 
-- name: disable ipv4 handling in /etc/dhcpcd.conf
+- name: ignore cnmac1 and cnmac2 handling in /etc/dhcpcd.conf
   lineinfile:
     state: present
     path: /etc/dhcpcd.conf
     regexp: '^denyinterfaces cnmac1 cnmac2'
     line: 'denyinterfaces cnmac1 cnmac2'
     insertafter: '^release'
+  register: dhcpcdconf3
   become: yes
 
 - name: disable ipv4 handling in /etc/dhcpcd.conf
@@ -33,6 +36,17 @@
     regexp: '^noipv4'
     line: 'noipv4'
     insertafter: '^denyinterfaces cnmac1 cnmac2'
+  register: dhcpcdconf4
+  become: yes
+
+- name: disable ipv6rs in /etc/dhcpcd.conf
+  lineinfile:
+    state: present
+    path: /etc/dhcpcd.conf
+    regexp: '^noipv6rs'
+    line: 'noipv6rs'
+    insertafter: '^noipv4'
+  register: dhcpcdconf5
   become: yes
 
 - name: insert cnmac0 line 1 in /etc/dhcpcd.conf
@@ -41,7 +55,8 @@
     path: /etc/dhcpcd.conf
     regexp: '^interface cnmac0'
     line: 'interface cnmac0'
-    insertafter: '^noipv4'
+    insertafter: '^noipv6rs'
+  register: dhcpcdconf6
   become: yes
 
 - name: insert cnmac0 line 2 in /etc/dhcpcd.conf
@@ -51,6 +66,7 @@
     regexp: '^    ipv6rs'
     line: '    ipv6rs'
     insertafter: '^interface cnmac0'
+  register: dhcpcdconf7
   become: yes
 
 - name: insert cnmac0 line 3 in /etc/dhcpcd.conf
@@ -60,6 +76,7 @@
     regexp: '^    ia_na 1'
     line: '    ia_na 1'
     insertafter: '^    ipv6rs'
+  register: dhcpcdconf8
   become: yes
 
 - name: insert internal interface line 1 in /etc/dhcpcd.conf
@@ -69,12 +86,39 @@
     regexp: '^    ia_pd 2 vether0/0/64'
     line: '    ia_pd 2 vether0/0/64'
     insertafter: '^    ia_na 1'
+  register: dhcpcdconf9
+  become: yes
+
+- name: insert pkg_scripts=dhcpcd in /etc/rc.conf.local
+  lineinfile:
+    state: present
+    path: /etc/rc.conf.local
+    regexp: '^pkg_scripts='
+    line: 'pkg_scripts=dhcpcd'
+  register: dhcpcdflags
   become: yes
 
 - name: enable dhcpcd
   shell: rcctl enable dhcpcd
+  when: dhcpcdconf1.changed or dhcpcdconf2.changed or dhcpcdconf3.changed or dhcpcdconf4.changed or dhcpcdconf5.changed or dhcpcdconf6.changed or dhcpcdconf7.changed or dhcpcdconf8.changed or dhcpcdconf9.changed
+  become: yes
+
+- name: check dhcpcd is running
+  shell: rcctl check dhcpcd
+  register: dhcpcdisup
+  ignore_errors: True
+  become: yes
+
+- name: start dhcpcd
+  shell: rcctl start dhcpcd
+  when: dhcpcdisup.rc|int != 0
+  register: startdhcpcd
+  ignore_errors: True
   become: yes
 
 - name: restart dhcpcd
   shell: rcctl restart dhcpcd
+#   when: (startdhcpcd.rc|int != 0 and "dhcpcd(failed)" in startdhcpcd.stdout) or (dhcpcdisup.rc|int == 0 and (dhcpcdconf1.changed or dhcpcdconf2.changed or dhcpcdconf3.changed or dhcpcdconf4.changed or dhcpcdconf5.changed or dhcpcdconf6.changed or dhcpcdconf7.changed or dhcpcdconf8.changed))
+  when: dhcpcdisup.rc|int == 0 and (dhcpcdconf1.changed or dhcpcdconf2.changed or dhcpcdconf3.changed or dhcpcdconf4.changed or dhcpcdconf5.changed or dhcpcdconf6.changed or dhcpcdconf7.changed or dhcpcdconf8.changed or dhcpcdconf9.changed)
+  register: restartdhcpcd
   become: yes

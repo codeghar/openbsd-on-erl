@@ -19,6 +19,7 @@
     path: /etc/sysctl.conf
     regexp: '^net.inet.ip.forwarding=1'
     line: 'net.inet.ip.forwarding=1'
+  register: ipv4forward
   become: yes
 
 - name: insert net.inet6.ip6.forwarding=1 in /etc/sysctl.conf
@@ -27,33 +28,52 @@
     path: /etc/sysctl.conf
     regexp: '^net.inet6.ip6.forwarding=1'
     line: 'net.inet6.ip6.forwarding=1'
+  register: ipv6forward
   become: yes
 
 - name: load newly added sysctl values
   shell: xargs sysctl < /etc/sysctl.conf
+  when: ipv4forward.changed or ipv6forward.changed
   become: yes
 
-- name: insert rtadvd_flags="vether0" in /etc/rc.conf.local
+- name: insert rad_flags="" in /etc/rc.conf.local
   lineinfile:
     state: present
     path: /etc/rc.conf.local
-    regexp: '^rtadvd_flags='
-    line: 'rtadvd_flags="vether0"'
+    regexp: '^rad_flags='
+    line: 'rad_flags='
+  register: radflags
   become: yes
 
-- name: copy rtadvd conf
+- name: copy rad conf
   template:
-    src: rtadvd.conf.j2
-    dest: /etc/rtadvd.conf
+    src: rad.conf.j2
+    dest: /etc/rad.conf
     owner: root
     group: wheel
     mode: "0644"
+  register: radconf
   become: yes
 
-- name: enable rtadvd
-  shell: rcctl enable rtadvd
+- name: enable rad
+  shell: rcctl enable rad
+  when: radflags.changed or radconf.changed
   become: yes
 
-- name: start rtadvd
-  shell: rcctl start rtadvd
+- name: check rad is running
+  shell: rcctl check rad
+  register: radisup
+  ignore_errors: True
+  become: yes
+
+- name: start rad
+  shell: rcctl start rad
+  when: radisup.rc|int != 0
+  register: startrad
+  become: yes
+
+- name: restart rad
+  shell: rcctl restart rad
+  when: radisup.rc|int == 0 and (radflags.changed or radconf.changed)
+  register: restartrad
   become: yes

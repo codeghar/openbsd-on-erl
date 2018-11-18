@@ -3,6 +3,7 @@
   template:
     src: dhcpd.conf.j2
     dest: /etc/dhcpd.conf
+  register: dhcpdconf
   become: yes
 
 - name: insert dhcpd_flags="vether0" in /etc/rc.conf.local
@@ -11,8 +12,29 @@
     path: /etc/rc.conf.local
     regexp: '^dhcpd_flags='
     line: 'dhcpd_flags="vether0"'
+  register: dhcpdflags
+  become: yes
+
+- name: enable dhcpd
+  shell: rcctl enable dhcpd
+  when: dhcpdconf.changed or dhcpdflags.changed
+  become: yes
+
+
+- name: check dhcpd is running
+  shell: rcctl check dhcpd
+  register: dhcpdisup
+  ignore_errors: True
+  become: yes
+
+- name: start dhcpd
+  shell: rcctl start dhcpd
+  when: dhcpdisup.rc|int != 0
+  register: startdhcpd
   become: yes
 
 - name: restart dhcpd
   shell: rcctl restart dhcpd
+  when: dhcpdisup.rc|int == 0 and (dhcpdconf.changed or dhcpdflags.changed)
+  register: restartdhcpd
   become: yes

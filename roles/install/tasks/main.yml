@@ -4,3 +4,22 @@
     state: latest
     name: dhcpcd
   become: yes
+
+- name: install curl
+  openbsd_pkg:
+    state: latest
+    name: curl
+  become: yes
+
+# - name: insert ntpd_flags=YES in /etc/rc.conf.local
+#   lineinfile:
+#     state: present
+#     path: /etc/rc.conf.local
+#     regexp: '^ntpd_flags='
+#     line: 'ntpd_flags=YES'
+#   register: ntpdflags
+#   become: yes
+
+- name: enable ntpd
+  shell: rcctl enable ntpd
+  become: yes
