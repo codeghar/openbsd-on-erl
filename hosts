@@ -1,5 +1,17 @@
-[ubnts]
-erl-setup ansible_python_interpreter=/usr/local/bin/python2.7
-#erl-admin ansible_python_interpreter=/usr/local/bin/python2.7
-usg-setup ansible_python_interpreter=/usr/local/bin/python2.7
-#usg-admin ansible_python_interpreter=/usr/local/bin/python2.7
+[example-init]
+example-setup ansible_python_interpreter=/usr/local/bin/python3
+
+[example]
+example-admin ansible_python_interpreter=/usr/local/bin/python3
+
+[erls-init]
+erl-setup ansible_python_interpreter=/usr/local/bin/python3
+
+[erls]
+erl-admin ansible_python_interpreter=/usr/local/bin/python3
+
+[usgs-init]
+usg-setup ansible_python_interpreter=/usr/local/bin/python3
+
+[usgs]
+usg-admin ansible_python_interpreter=/usr/local/bin/python3

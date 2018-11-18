@@ -1,5 +1,5 @@
 ---
-- hosts: ubnts
+- hosts: "{{ host_group }}"
   roles:
     - role: install
     - role: network
@@ -9,6 +9,7 @@
         - "127.0.0.1"
         - "::1"
         - "{{ vether0_ip }}"
+        - "::0"
     - role: dhcpd
     - role: router
     - role: pf
