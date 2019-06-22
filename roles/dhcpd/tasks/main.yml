@@ -6,6 +6,14 @@
   register: dhcpdconf
   become: yes
 
+- name: touch /etc/rc.conf.local
+  file:
+    path: /etc/rc.conf.local
+    owner: root
+    group: wheel
+    state: touch
+  become: yes
+
 - name: insert dhcpd_flags="vether0" in /etc/rc.conf.local
   lineinfile:
     state: present

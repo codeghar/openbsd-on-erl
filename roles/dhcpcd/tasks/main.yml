@@ -89,6 +89,14 @@
   register: dhcpcdconf9
   become: yes
 
+- name: touch /etc/rc.conf.local
+  file:
+    path: /etc/rc.conf.local
+    owner: root
+    group: wheel
+    state: touch
+  become: yes
+
 - name: insert pkg_scripts=dhcpcd in /etc/rc.conf.local
   lineinfile:
     state: present
