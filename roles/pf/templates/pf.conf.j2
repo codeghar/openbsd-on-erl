@@ -64,7 +64,10 @@ block log
 ### ~~~ Link-scoped services ~~~ ###
 
 # DHCPv6 client: make IA_PD requests and receive responses to them
-pass out quick on egress inet6 proto udp from (egress) to ff02::1:2 port dhcpv6-server
+pass out log quick on egress inet6 proto udp from (egress) to ff02::1/16 port dhcpv6-server
+pass out log quick on egress inet6 proto udp from (egress) to ff02::2/16 port dhcpv6-server
+pass in log quick on egress inet6 proto udp from ff02::1/16 port dhcpv6-client
+pass in log quick on egress inet6 proto udp from ff02::2/16 port dhcpv6-client
 pass in quick on egress inet6 proto udp to (egress) port dhcpv6-client
 
 ### ~~~ Bulk pass rules ~~~ ###

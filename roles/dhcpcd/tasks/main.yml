@@ -23,8 +23,8 @@
   lineinfile:
     state: present
     path: /etc/dhcpcd.conf
-    regexp: '^denyinterfaces cnmac1 cnmac2'
-    line: 'denyinterfaces cnmac1 cnmac2'
+    regexp: '^denyinterfaces cnmac1 cnmac2 vether0'
+    line: 'denyinterfaces cnmac1 cnmac2 vether0'
     insertafter: '^release'
   register: dhcpcdconf3
   become: yes
@@ -35,7 +35,7 @@
     path: /etc/dhcpcd.conf
     regexp: '^noipv4'
     line: 'noipv4'
-    insertafter: '^denyinterfaces cnmac1 cnmac2'
+    insertafter: '^denyinterfaces cnmac1 cnmac2 vether0'
   register: dhcpcdconf4
   become: yes
 

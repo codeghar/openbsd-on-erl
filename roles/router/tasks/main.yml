@@ -77,3 +77,15 @@
   when: radisup.rc|int == 0 and (radflags.changed or radconf.changed)
   register: restartrad
   become: yes
+
+# This may not actually be needed because OpenBSD moved away from rtadvd to rad
+# Adding it here because of superstitious reasons because adding this file
+# appeared to make IPv6 prefix delegation and SLAAC work on the LAN
+- name: touch /etc/rtadvd.conf
+  file:
+    path: /etc/rtadvd.conf
+    state: touch
+    owner: root
+    group: wheel
+    mode: '0664'
+  become: yes
